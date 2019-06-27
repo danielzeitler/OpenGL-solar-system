@@ -1,7 +1,3 @@
-//
-// Created by kalle on 05.12.16.
-//
-
 #include "SolarSystem.h"
 
 #include "Camera.h"

@@ -1,10 +1,3 @@
-/* 
- * File:   Texture.h
- * Author: kalle
- *
- * Created on 2. Februar 2015, 14:20
- */
-
 #ifndef __TEXTURE_H__
 #define	__TEXTURE_H__
 

@@ -1,7 +1,3 @@
-//
-// Created by kalle on 05.12.16.
-//
-
 #ifndef __CAMERA_H__
 #define __CAMERA_H__
 
