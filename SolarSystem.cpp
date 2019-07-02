@@ -10,6 +10,8 @@
 
 #include "Moon.h"
 
+#include "SpecialPlanet.h"
+
 std::string progName = "SolarSystem";
 
 // Our SDL_Window ( just like with SDL2 wihout OpenGL)
@@ -45,6 +47,9 @@ glm::vec3 g_InitialCameraPosition = glm::vec3(0,0,7);
 //-----------------------------------------------------------------
 
 bool stopRenderLoop = false;
+bool showSpecialPlanet = false;
+bool showMoon = false;
+
 
 //-----------------------------------------------------------------
 
@@ -56,6 +61,7 @@ int g_M1, g_M2, g_M3;
 
 
 Moon *moon;
+SpecialPlanet *specialPlanet;
 
 glm::quat g_SunRotation = QUAT_IDENTITY;
 glm::vec3 g_SunPosition(10,10,10);
@@ -175,6 +181,7 @@ void updateObjectMatrices() {
     skybox.setGViewMatrix(g_Camera.GetViewMatrix());
 
     // forEach planet
+
     moon->setGProjectionMatrix(g_Camera.GetProjectionMatrix());
     moon->setGViewMatrix(g_Camera.GetViewMatrix());
     moon->setGCameraPosition(g_Camera.GetPosition());
@@ -182,6 +189,16 @@ void updateObjectMatrices() {
 
     // TODO: move to initPlanet
     moon->setGLightColor(g_lightColor);
+
+
+    // specialPlanet planet
+    specialPlanet->setGProjectionMatrix(g_Camera.GetProjectionMatrix());
+    specialPlanet->setGViewMatrix(g_Camera.GetViewMatrix());
+    specialPlanet->setGCameraPosition(g_Camera.GetPosition());
+    specialPlanet->setGSunPosition(g_SunPosition);
+
+    // TODO: move to initPlanet
+    specialPlanet->setGLightColor(g_lightColor);
 }
 
 
@@ -192,7 +209,13 @@ void DrawScene(float tpf) {
     skybox.draw();
 
     // forEach planet
-    moon->draw(tpf);
+    if(showMoon) {
+        moon->draw(tpf);
+    }
+
+    if(showSpecialPlanet) {
+        specialPlanet->draw(tpf);
+    }
 
 
 
@@ -214,6 +237,7 @@ void MoveObjects(float tpf) {
 
     // TODO: forEach planets
     moon->update(tpf);
+    specialPlanet->update(tpf);
 
 }
 
@@ -249,6 +273,14 @@ void SDLKeyboardHandler(SDL_Keysym key, int down) {
             break;
         case SDLK_a:
             g_A = down;
+            break;
+        case SDLK_v:
+            // g_Q = down;
+            showSpecialPlanet = !showSpecialPlanet;
+            break;
+        case SDLK_c:
+            // g_Q = down;
+            showMoon = !showMoon;
             break;
         case SDLK_s:
             g_S = down;
@@ -413,6 +445,9 @@ int main(int argc, char *argv[]) {
     skybox.initAll();
 
     moon = new Moon();
+    specialPlanet = new SpecialPlanet();
+
+
 
     updateObjectMatrices();
 
