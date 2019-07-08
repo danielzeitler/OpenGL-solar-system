@@ -1,9 +1,6 @@
-
 #version 410
 
-//--------------------------------------------------------------------------------------------
-
-// taken from http://www.thetenthplanet.de/archives/1180
+in vec2 uv;
 
 in vec2 g_texcoord;
 in vec3 g_vertexNormal;
@@ -25,13 +22,13 @@ uniform vec4 u_materialSpecular;
 
 uniform float u_materialShininess;
 
+uniform vec2 u_resolution;
+uniform float u_time;
 
 out vec4 fragColor;
 
+#define PI 3.14159265358979323846
 
-
-
-//--------------------------------------------------------------------------------------------
 
 mat3 cotangent_frame( vec3 N, vec3 p, vec2 uv ) {
     // get edge vectors of the pixel triangle
@@ -49,8 +46,6 @@ mat3 cotangent_frame( vec3 N, vec3 p, vec2 uv ) {
     return mat3( T * invmax, B * invmax, N );
 }
 
-
-//--------------------------------------------------------------------------------------------
 #define WITH_NORMALMAP_UNSIGNED
 
 vec3 perturb_normal( vec3 N, vec3 V, vec2 texcoord ) {
@@ -59,16 +54,18 @@ vec3 perturb_normal( vec3 N, vec3 V, vec2 texcoord ) {
     // V, the view vector (vertex to eye)
     vec3 map = texture( mapNormal, texcoord ).xyz;
 
-#ifdef WITH_NORMALMAP_UNSIGNED
-    map = map * 255./127. - 128./127.;
-#endif
-#ifdef WITH_NORMALMAP_2CHANNEL
-     map.z = sqrt( 1. - dot( map.xy, map.xy ) );
-#endif
-#ifdef WITH_NORMALMAP_GREEN_UP
-    map.y = -map.y;
-#endif
+    #ifdef WITH_NORMALMAP_UNSIGNED
+        map = map * 255./127. - 128./127.;
+    #endif
+    #ifdef WITH_NORMALMAP_2CHANNEL
+         map.z = sqrt( 1. - dot( map.xy, map.xy ) );
+    #endif
+    #ifdef WITH_NORMALMAP_GREEN_UP
+        map.y = -map.y;
+    #endif
+
     mat3 TBN = cotangent_frame( N, -V, texcoord );
+
     return normalize( TBN * map );
 }
 
@@ -94,22 +91,34 @@ void main() {
     float diff = clamp(dot(N, L), 0.0, 1.0);
     vec3 diffuseColor = diff * u_materialDiffuse.rgb * u_materialDiffuse.w * u_lightColor.rgb * u_lightColor.w;
 
-
     // specular
     vec3 V = normalize(u_cameraPosition - g_vertexPosition); // viewDir
     vec3 R = normalize( reflect(-L, N) );
     float spec = pow(max(dot(R,V), 0.0), u_materialShininess);
     vec3 specularColor = spec * u_materialSpecular.rgb * u_materialSpecular.w * u_lightColor.rgb * u_lightColor.w;
 
-    // ...
-
     vec4 whiteColor = vec4(1.0);
     vec4 surfaceColor = texture( mapSurface, g_texcoord );
 
-    //surfaceColor = whiteColor;
 
     vec4 lightTerm = vec4(ambientColor + emissiveColor + diffuseColor + specularColor, 1.0);
 
-    fragColor = surfaceColor * lightTerm;
 
+    // *************************
+    // Custom Shader
+    // *************************
+
+    vec2 coord = gl_FragCoord.xy * 6.0;
+
+    for(int n = 1; n < 8; n++) {
+        float i = float(n);
+        coord += vec2(0.7 / i * sin(i * coord.y + u_time + 0.3 * i) + 0.8, 0.4 / i * sin(coord.x + u_time + 0.3 * i) + 1.6);
+    }
+
+   coord *= vec2(0.7 / sin(coord.y + u_time + 0.3) + 0.8, 0.4 / sin(coord.x + u_time + 0.3) + 1.6);
+
+    vec3 color = vec3(0.5 * sin(coord.x) + 0.5, 0.5 * sin(coord.y) + 0.5, sin(coord.x + coord.y));
+    // fragColor = vec4(color, 1.0) * lightTerm * surfaceColor;
+
+    fragColor = vec4(color, 1.0);
 }

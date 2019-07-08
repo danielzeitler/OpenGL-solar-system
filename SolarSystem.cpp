@@ -275,11 +275,9 @@ void SDLKeyboardHandler(SDL_Keysym key, int down) {
             g_A = down;
             break;
         case SDLK_v:
-            // g_Q = down;
             showSpecialPlanet = !showSpecialPlanet;
             break;
         case SDLK_c:
-            // g_Q = down;
             showMoon = !showMoon;
             break;
         case SDLK_s:

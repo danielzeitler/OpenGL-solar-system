@@ -15,6 +15,7 @@ out vec2 g_texcoord;
 out vec3 g_vertexNormal;
 out vec3 g_vertexPosition;
 out vec3 g_viewVector;
+out vec2 uv;
 
 
 
