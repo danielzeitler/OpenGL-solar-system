@@ -44,6 +44,10 @@ void SpecialPlanet::initUniforms() {
 
     g_uniformLightColor = glGetUniformLocation(g_shader, "u_lightColor");
 
+    g_uniformUTime = glGetUniformLocation(g_shader, "u_time");
+
+
+
     //---------------------------------------------------------------------------
 
     g_uniformDiffuseMap = glGetUniformLocation(g_shader, "mapSurface");
@@ -133,10 +137,11 @@ void SpecialPlanet::update(float tpf) {
     glm::quat rot_y = glm::angleAxis<float>(0.0003f * tpf, axis_y);
 
     g_rotation = g_rotation * rot_y;
+    // g_rotation = g_rotation;
 }
 
 
-void SpecialPlanet::draw(float tpf) {
+void SpecialPlanet::draw(float tpf, float time) {
 
     // bind vao
     glBindVertexArray( g_vao );
@@ -159,6 +164,7 @@ void SpecialPlanet::draw(float tpf) {
 
     glm::mat4 model_translation = glm::translate(glm::vec3(0));
     glm::mat4 model_scale = glm::scale(glm::vec3(1));
+    // glm::mat4 model_rotation = glm::toMat4(QUAT_IDENTITY);
     glm::mat4 model_rotation = glm::toMat4(g_rotation);
     glm::mat4 g_modelMatrix = model_translation * model_rotation * model_scale;
 
@@ -178,6 +184,10 @@ void SpecialPlanet::draw(float tpf) {
     glUniform4fv( g_uniformMaterialDiffuse, 1, glm::value_ptr(g_diffuseColor));
     glUniform4fv( g_uniformMaterialSpecular, 1, glm::value_ptr(g_specularColor));
     glUniform1f( g_uniformMaterialShininess, g_shininess);
+
+//----------------------------------------------
+
+    glUniform1f( g_uniformUTime, time);
 
 //----------------------------------------------
 

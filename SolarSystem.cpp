@@ -32,6 +32,8 @@ float avgFps = 0;
 int screenWidth = 512;
 int screenHeight = 512;
 
+float renderTime = 0;
+
 //-----------------------------------------------------------------
 
 Skybox skybox;
@@ -202,7 +204,7 @@ void updateObjectMatrices() {
 }
 
 
-void DrawScene(float tpf) {
+void DrawScene(float tpf, float time) {
 
 
 
@@ -214,7 +216,7 @@ void DrawScene(float tpf) {
     }
 
     if(showSpecialPlanet) {
-        specialPlanet->draw(tpf);
+        specialPlanet->draw(tpf, time);
     }
 
 
@@ -417,12 +419,15 @@ void Render() {
         MoveObjects(tpf);
 
         // draw the scene
-        DrawScene(tpf);
+        DrawScene(tpf, renderTime);
 
         // calc tpf
         last = now;
         now = SDL_GetPerformanceCounter();
         tpf = ((now - last) * 1000.0 /(float) SDL_GetPerformanceFrequency());
+
+         // store time
+         renderTime = SDL_GetTicks() / 1000.0f;
     }
 }
 

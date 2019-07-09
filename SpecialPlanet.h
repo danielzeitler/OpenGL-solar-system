@@ -10,7 +10,7 @@ public:
 
     SpecialPlanet();
 
-    void draw(float tpf);
+    void draw(float tpf, float time);
 
     void update(float tpf);
 
@@ -85,6 +85,8 @@ private:
 
     GLuint g_uniformDiffuseMap;
     GLuint g_uniformNormalMap;
+
+    GLuint g_uniformUTime;
 
 
     //-----------------------------------------------------------------------------
