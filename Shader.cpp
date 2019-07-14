@@ -1,4 +1,3 @@
-
 #include "SolarSystem.h"
 
 #include "Shader.h"

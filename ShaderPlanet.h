@@ -1,7 +1,6 @@
 #ifndef _SHADERPLANET_H_
 #define _SHADERPLANET_H_
 
-
 #include "Sphere.h"
 
 class ShaderPlanet {

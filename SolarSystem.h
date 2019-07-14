@@ -6,6 +6,7 @@
 #include <sstream>
 #include <fstream>
 
+#include <map>
 #include <vector>
 #include <ctime>
 
@@ -21,8 +22,6 @@
 #ifdef __WIN32__
 #include <GL/wglew.h>
 #endif
-
-
 
 // SDL2 Headers
 #include <SDL2/SDL.h>

@@ -8,7 +8,7 @@
 #include "Venus.h"
 #include "ShaderPlanet.h"
 #include "ParticleEmitter.h"
-
+#include "Model.h"
 
 std::string progName = "SolarSystem";
 
@@ -69,13 +69,16 @@ ShaderPlanet *shaderPlanet;
 // Init Particle Emiter
 ParticleEmitter *particleEmitter;
 
+// Init Model Loader
+Model* model;
 
 glm::quat g_SunRotation = QUAT_IDENTITY;
 glm::vec3 g_SunPosition(10,10,10);
 glm::vec4 g_lightColor = glm::vec4(1.0, 1.0, 1.0, 1.0);
 
-void Cleanup();
+void UpdateModelMatrices();
 
+void Cleanup();
 
 void PrintOpenGLVersion() {
     std::cout << "-------------------------------------------------------\n";
@@ -84,7 +87,6 @@ void PrintOpenGLVersion() {
     std::cout << "INFO: OpenGL Renderer: " << glGetString(GL_RENDERER) << std::endl;
     std::cout << "-------------------------------------------------------\n";
 }
-
 
 void InitSDL() {
     // init SDL video system
@@ -166,7 +168,33 @@ void InitViewport() {
     g_Camera.SetViewport(0,0,screenWidth, screenHeight);
     g_Camera.SetProjectionRH(60.0f, screenWidth / (float) screenHeight, 0.1f, 1000.0f);
 
+    UpdateModelMatrices();
+
+    model->setGLightColor(g_lightColor);
+
     std::cout << "Init Viewport done.\n";
+}
+
+
+void InitModel() {
+    Model::ModelOptions opt;
+    opt.light_scale = 3.0f;
+    opt.model_scale = glm::vec3(3.0f);
+    opt.model_position = glm::vec3(0.0, 3.0, 0.0);
+
+
+    model = new Model("spaceship.obj", "../../res/models/spaceship/", opt);
+
+    std::cout << "Model initialized.\n";
+}
+
+void UpdateModelMatrices() {
+    model->setGProjectionMatrix(g_Camera.GetProjectionMatrix());
+    model->setGViewMatrix(g_Camera.GetViewMatrix());
+
+    model->setGCameraPosition(g_Camera.GetPosition());
+    model->setGSunPosition(g_SunPosition);
+
 }
 
 void updateObjectMatrices() {
@@ -227,6 +255,8 @@ void DrawScene(float tpf, float time) {
     // Particle Emitter draw
     particleEmitter->draw(tpf);
 
+    // Draw modle
+    model->draw();
 
     // swap back and front buffer (show frame)
     SDL_GL_SwapWindow(mainWindow);
@@ -300,7 +330,8 @@ void SDLKeyboardHandler(SDL_Keysym key, int down) {
             g_Camera.SetRotation(QUAT_IDENTITY);
 
             particleEmitter->setRotation(QUAT_IDENTITY);
-
+            model->setGRotation(QUAT_IDENTITY);
+            UpdateModelMatrices();
             updateObjectMatrices();
 
             break;
@@ -332,20 +363,25 @@ void MouseMoveHandler(SDL_MouseMotionEvent event) {
     }
 
     if (g_M1) {
+        // Get rotations
         glm::quat particle_rotation = particleEmitter->getRotation();
+        glm::quat model_rotation = model->getGRotation();
 
-        /*
-        glm::vec3 axis_x = glm::normalize(glm::vec3(1,0,0) * glm::toMat3(g_Rotation));
-        glm::vec3 axis_y = glm::normalize(glm::vec3(0,1,0) * glm::toMat3(g_Rotation));
+        glm::vec3 axis_x = glm::normalize(glm::vec3(1,0,0) * glm::toMat3(model_rotation));
+        glm::vec3 axis_y = glm::normalize(glm::vec3(0,1,0) * glm::toMat3(model_rotation));
 
         glm::quat rot_x = glm::angleAxis<float>(0.01 * event.yrel, axis_x);
         glm::quat rot_y = glm::angleAxis<float>(0.01 * event.xrel, axis_y);
 
         particle_rotation = particle_rotation * rot_x * rot_y;
-        */
 
+        // Modell Rotation
+        model_rotation = model_rotation * rot_x * rot_y;
+        model->setGRotation(model_rotation);
+
+
+        // Particle Emitter
         particleEmitter->setRotation(particle_rotation);
-
         particleEmitter->updateMatrices(g_Camera.GetProjectionMatrix(), g_Camera.GetViewMatrix());
     }
 
@@ -444,6 +480,8 @@ int main(int argc, char *argv[]) {
     InitGLEW();
 
     InitGL();
+
+    InitModel();
 
     InitViewport();
 
