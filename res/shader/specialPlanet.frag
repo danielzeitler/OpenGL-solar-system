@@ -109,7 +109,7 @@ void main() {
     vec2 coord = g_texcoord.yx * 6.0;
 
     for(int n = 1; n < 8; n++) {
-        float i = float(n);  
+        float i = float(n);
         coord += vec2(0.7 / i * sin(i * coord.y - u_time + 0.2 * i) + 0.8, 0.4 / i * sin(coord.x - u_time + 0.2 * i) + 1.6);
     }
 

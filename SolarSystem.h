@@ -41,7 +41,8 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include <glm/gtc/random.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #define MAT4_IDENTITY glm::mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1)
 #define QUAT_IDENTITY glm::quat(MAT4_IDENTITY)

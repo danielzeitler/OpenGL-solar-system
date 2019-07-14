@@ -1,20 +1,14 @@
 #include "SolarSystem.h"
-
 #include "Camera.h"
-
 #include "Shader.h"
-
 #include "Texture.h"
-
 #include "Skybox.h"
-
 #include "Moon.h"
-
 #include "SpecialPlanet.h"
-
 #include "Venus.h"
-
 #include "ShaderPlanet.h"
+#include "ParticleEmitter.h"
+
 
 std::string progName = "SolarSystem";
 
@@ -71,6 +65,10 @@ Venus *venus;
 
 // Init Special Planet
 ShaderPlanet *shaderPlanet;
+
+// Init Particle Emiter
+ParticleEmitter *particleEmitter;
+
 
 glm::quat g_SunRotation = QUAT_IDENTITY;
 glm::vec3 g_SunPosition(10,10,10);
@@ -210,6 +208,10 @@ void updateObjectMatrices() {
 
     // TODO: move to initPlanet
     shaderPlanet->setGLightColor(g_lightColor);
+
+
+    // Particle Emitter
+    particleEmitter->updateMatrices(g_Camera.GetProjectionMatrix(), g_Camera.GetViewMatrix());
 }
 
 
@@ -221,6 +223,10 @@ void DrawScene(float tpf, float time) {
     specialPlanet->draw(tpf, time);
     venus->draw(tpf, time);
     shaderPlanet->draw(tpf, time);
+
+    // Particle Emitter draw
+    particleEmitter->draw(tpf);
+
 
     // swap back and front buffer (show frame)
     SDL_GL_SwapWindow(mainWindow);
@@ -242,6 +248,9 @@ void MoveObjects(float tpf) {
     specialPlanet->update(tpf);
     venus->update(tpf);
     shaderPlanet->update(tpf);
+
+    // Particle Emitter
+    particleEmitter->update(tpf);
 }
 
 Uint32 CalcFPS(Uint32 interval, void *param) {
@@ -290,6 +299,8 @@ void SDLKeyboardHandler(SDL_Keysym key, int down) {
             g_Camera.SetPosition(g_InitialCameraPosition);
             g_Camera.SetRotation(QUAT_IDENTITY);
 
+            particleEmitter->setRotation(QUAT_IDENTITY);
+
             updateObjectMatrices();
 
             break;
@@ -304,13 +315,11 @@ void SDLKeyboardHandler(SDL_Keysym key, int down) {
 void MouseMoveHandler(SDL_MouseMotionEvent event) {
 
     if (g_M2) {
-
         float speed = 0.01f;
 
         g_Camera.Translate(glm::vec3(-event.xrel, event.yrel, 0) * speed);
 
         updateObjectMatrices();
-
     }
 
     if (g_M3) {
@@ -320,20 +329,24 @@ void MouseMoveHandler(SDL_MouseMotionEvent event) {
         g_Camera.SetRotation(g_Camera.GetRotation() * cam_rot_x * cam_rot_y);
 
         updateObjectMatrices();
-
     }
 
     if (g_M1) {
+        glm::quat particle_rotation = particleEmitter->getRotation();
 
-/*
+        /*
         glm::vec3 axis_x = glm::normalize(glm::vec3(1,0,0) * glm::toMat3(g_Rotation));
         glm::vec3 axis_y = glm::normalize(glm::vec3(0,1,0) * glm::toMat3(g_Rotation));
 
         glm::quat rot_x = glm::angleAxis<float>(0.01 * event.yrel, axis_x);
         glm::quat rot_y = glm::angleAxis<float>(0.01 * event.xrel, axis_y);
 
-        g_Rotation = g_Rotation * rot_x * rot_y;
-*/
+        particle_rotation = particle_rotation * rot_x * rot_y;
+        */
+
+        particleEmitter->setRotation(particle_rotation);
+
+        particleEmitter->updateMatrices(g_Camera.GetProjectionMatrix(), g_Camera.GetViewMatrix());
     }
 
 
@@ -444,6 +457,9 @@ int main(int argc, char *argv[]) {
     specialPlanet = new SpecialPlanet();
     venus = new Venus();
     shaderPlanet = new ShaderPlanet();
+
+    // Particle Emitter
+    particleEmitter = new ParticleEmitter(500, 3);
 
     updateObjectMatrices();
 
