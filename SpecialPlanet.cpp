@@ -18,8 +18,6 @@ SpecialPlanet::SpecialPlanet() {
     initAll();
 }
 
-
-
 void SpecialPlanet::initAll() {
     initTextures();
     initShader();
@@ -47,12 +45,10 @@ void SpecialPlanet::initUniforms() {
     g_uniformUTime = glGetUniformLocation(g_shader, "u_time");
 
 
-
     //---------------------------------------------------------------------------
 
     g_uniformDiffuseMap = glGetUniformLocation(g_shader, "mapSurface");
     g_uniformNormalMap = glGetUniformLocation(g_shader, "mapNormal");
-
 }
 
 void SpecialPlanet::initVAO() {
@@ -101,7 +97,6 @@ void SpecialPlanet::initVAO() {
 
     // cout
     std::cout << planetName << ": VAO + VBO initialized.\n";
-
 }
 
 void SpecialPlanet::initShader() {
@@ -162,8 +157,9 @@ void SpecialPlanet::draw(float tpf, float time) {
 
 //---------------------------------------------------
 
-    glm::mat4 model_translation = glm::translate(glm::vec3(0));
-    glm::mat4 model_scale = glm::scale(glm::vec3(1));
+    glm::mat4 model_translation = glm::translate(this->g_position);
+    glm::mat4 model_scale = glm::scale(this->g_scale);
+
     // glm::mat4 model_rotation = glm::toMat4(QUAT_IDENTITY);
     glm::mat4 model_rotation = glm::toMat4(g_rotation);
     glm::mat4 g_modelMatrix = model_translation * model_rotation * model_scale;
@@ -199,7 +195,6 @@ void SpecialPlanet::draw(float tpf, float time) {
     glUseProgram(0);
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
-
 }
 
 void SpecialPlanet::setGViewMatrix(const mat4 &gViewMatrix) {

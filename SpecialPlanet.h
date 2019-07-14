@@ -23,8 +23,6 @@ public:
 
     void setGLightColor(const vec4 &gLightColor);
 
-
-
 protected:
 
     // TODO: make static (const)
@@ -49,25 +47,24 @@ private:
     //-----------------------------------------------------------
 
     std::string planetName = "SpecialPlanet";
-
     std::string vertexShaderSource = "../../res/shader/specialPlanet.vert";
     std::string fragmentShaderSource = "../../res/shader/specialPlanet.frag";
 
     //-----------------------------------------------------------
 
     std::string diffuseMap = "../../res/textures/specialPlanet/8k_venus_surface.jpg";
-
     GLuint g_diffuseMap;
     GLuint g_normalMap;
 
     //-----------------------------------------------------------
 
+    glm::vec3 g_position = glm::vec3(-4.0, 0.0, 0.0);
+    glm::vec3 g_scale = glm::vec3(1.0);
     glm::quat g_rotation = QUAT_IDENTITY;
 
     //-----------------------------------------------------------
 
     //TODO: uniforms
-
     GLuint g_uniformMVP;
     GLuint g_uniformModelMatrix;
 
@@ -88,7 +85,6 @@ private:
 
     GLuint g_uniformUTime;
 
-
     //-----------------------------------------------------------------------------
 
     glm::vec3 g_sunPosition = glm::vec3(10,10,10);
@@ -103,8 +99,6 @@ private:
     glm::vec4 g_specularColor = glm::vec4(1, 1, 1, 0.5);
 
     float g_shininess = 50.0f;
-
 };
-
 
 #endif //_SpecialPlanet_H_

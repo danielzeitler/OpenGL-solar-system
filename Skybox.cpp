@@ -22,7 +22,7 @@ void Skybox::initAll() {
 void Skybox::initTexture() {
 
     // Load Cubemap
-    g_Texture = Texture::LoadSkybox("../../res/textures/skybox/",".jpg");
+    g_Texture = Texture::LoadSkybox("../../res/textures/skybox/",".png");
 
     std::cout << "SKYBOX: Texture initialized.\n";
 

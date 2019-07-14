@@ -12,6 +12,10 @@
 
 #include "SpecialPlanet.h"
 
+#include "Venus.h"
+
+#include "ShaderPlanet.h"
+
 std::string progName = "SolarSystem";
 
 // Our SDL_Window ( just like with SDL2 wihout OpenGL)
@@ -29,29 +33,24 @@ int frameCount = 0;
 // Avg FPS
 float avgFps = 0;
 
-int screenWidth = 512;
-int screenHeight = 512;
+int screenWidth = 1024;
+int screenHeight = 768;
 
 float renderTime = 0;
 
-//-----------------------------------------------------------------
-
+// Init Skybox
 Skybox skybox;
 
-//-----------------------------------------------------------------
-
+// Init Camera
 Camera g_Camera;
 
-glm::vec3 g_InitialCameraPosition = glm::vec3(0,0,7);
+glm::vec3 g_InitialCameraPosition = glm::vec3(0,0,15);
 
 //glm::quat g_InitialCameraRotation = QUAT_IDENTITY;
 
 //-----------------------------------------------------------------
 
 bool stopRenderLoop = false;
-bool showSpecialPlanet = false;
-bool showMoon = false;
-
 
 //-----------------------------------------------------------------
 
@@ -61,16 +60,21 @@ int g_M1, g_M2, g_M3;
 
 //-----------------------------------------------------------------
 
-
+// Init Moon
 Moon *moon;
+
+// Init Special Planet
 SpecialPlanet *specialPlanet;
+
+// Init Special Planet
+Venus *venus;
+
+// Init Special Planet
+ShaderPlanet *shaderPlanet;
 
 glm::quat g_SunRotation = QUAT_IDENTITY;
 glm::vec3 g_SunPosition(10,10,10);
 glm::vec4 g_lightColor = glm::vec4(1.0, 1.0, 1.0, 1.0);
-
-
-//-----------------------------------------------------------------
 
 void Cleanup();
 
@@ -92,9 +96,7 @@ void InitSDL() {
     }
 
     // create window
-    mainWindow = SDL_CreateWindow(
-                progName.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight,
-                SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+    mainWindow = SDL_CreateWindow(progName.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 
     if (!mainWindow) {
         std::cerr << "Unable to create window\n";
@@ -146,11 +148,9 @@ void InitGLEW() {
     }
 
     std::cout << "Init GLEW done.\n";
-
 }
 
 void InitGL() {
-    // nothing to do here (just for now)
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     glClearDepth(1.0f);
@@ -159,31 +159,23 @@ void InitGL() {
     glEnable(GL_CULL_FACE);
 
     std::cout << "Init GL done.\n";
-
 }
 
-
 void InitViewport() {
-
     g_Camera.SetPosition(g_InitialCameraPosition);
     g_Camera.SetRotation(QUAT_IDENTITY);
 
     g_Camera.SetViewport(0,0,screenWidth, screenHeight);
     g_Camera.SetProjectionRH(60.0f, screenWidth / (float) screenHeight, 0.1f, 1000.0f);
 
-    //--------------------
-
     std::cout << "Init Viewport done.\n";
-
 }
 
 void updateObjectMatrices() {
-
     skybox.setGProjectionMatrix(g_Camera.GetProjectionMatrix());
     skybox.setGViewMatrix(g_Camera.GetViewMatrix());
 
     // forEach planet
-
     moon->setGProjectionMatrix(g_Camera.GetProjectionMatrix());
     moon->setGViewMatrix(g_Camera.GetViewMatrix());
     moon->setGCameraPosition(g_Camera.GetPosition());
@@ -191,7 +183,6 @@ void updateObjectMatrices() {
 
     // TODO: move to initPlanet
     moon->setGLightColor(g_lightColor);
-
 
     // specialPlanet planet
     specialPlanet->setGProjectionMatrix(g_Camera.GetProjectionMatrix());
@@ -201,25 +192,35 @@ void updateObjectMatrices() {
 
     // TODO: move to initPlanet
     specialPlanet->setGLightColor(g_lightColor);
+
+    // Venus planet
+    venus->setGProjectionMatrix(g_Camera.GetProjectionMatrix());
+    venus->setGViewMatrix(g_Camera.GetViewMatrix());
+    venus->setGCameraPosition(g_Camera.GetPosition());
+    venus->setGSunPosition(g_SunPosition);
+
+    // TODO: move to initPlanet
+    shaderPlanet->setGLightColor(g_lightColor);
+
+    // ShaderPlanet planet
+    shaderPlanet->setGProjectionMatrix(g_Camera.GetProjectionMatrix());
+    shaderPlanet->setGViewMatrix(g_Camera.GetViewMatrix());
+    shaderPlanet->setGCameraPosition(g_Camera.GetPosition());
+    shaderPlanet->setGSunPosition(g_SunPosition);
+
+    // TODO: move to initPlanet
+    shaderPlanet->setGLightColor(g_lightColor);
 }
 
 
 void DrawScene(float tpf, float time) {
-
-
-
     skybox.draw();
 
     // forEach planet
-    if(showMoon) {
-        moon->draw(tpf);
-    }
-
-    if(showSpecialPlanet) {
-        specialPlanet->draw(tpf, time);
-    }
-
-
+    moon->draw(tpf);
+    specialPlanet->draw(tpf, time);
+    venus->draw(tpf, time);
+    shaderPlanet->draw(tpf, time);
 
     // swap back and front buffer (show frame)
     SDL_GL_SwapWindow(mainWindow);
@@ -236,11 +237,11 @@ void MoveObjects(float tpf) {
 
     updateObjectMatrices();
 
-
     // TODO: forEach planets
     moon->update(tpf);
     specialPlanet->update(tpf);
-
+    venus->update(tpf);
+    shaderPlanet->update(tpf);
 }
 
 Uint32 CalcFPS(Uint32 interval, void *param) {
@@ -265,7 +266,6 @@ Uint32 CalcFPS(Uint32 interval, void *param) {
     timerID = SDL_AddTimer(interval, CalcFPS, param);
 
     return 0;
-
 }
 
 void SDLKeyboardHandler(SDL_Keysym key, int down) {
@@ -277,10 +277,8 @@ void SDLKeyboardHandler(SDL_Keysym key, int down) {
             g_A = down;
             break;
         case SDLK_v:
-            showSpecialPlanet = !showSpecialPlanet;
             break;
         case SDLK_c:
-            showMoon = !showMoon;
             break;
         case SDLK_s:
             g_S = down;
@@ -336,11 +334,6 @@ void MouseMoveHandler(SDL_MouseMotionEvent event) {
 
         g_Rotation = g_Rotation * rot_x * rot_y;
 */
-        //---------------------------
-
-
-        //TODO: ????
-
     }
 
 
@@ -426,8 +419,8 @@ void Render() {
         now = SDL_GetPerformanceCounter();
         tpf = ((now - last) * 1000.0 /(float) SDL_GetPerformanceFrequency());
 
-         // store time
-         renderTime = SDL_GetTicks() / 1000.0f;
+        // store time
+        renderTime = SDL_GetTicks() / 1000.0f;
     }
 }
 
@@ -443,17 +436,16 @@ int main(int argc, char *argv[]) {
 
     PrintOpenGLVersion();
 
-    //.....................................
+    //---------------------------------------
 
     skybox.initAll();
 
     moon = new Moon();
     specialPlanet = new SpecialPlanet();
-
-
+    venus = new Venus();
+    shaderPlanet = new ShaderPlanet();
 
     updateObjectMatrices();
-
 
     //---------------------------------------
 

@@ -28,9 +28,6 @@ uniform float u_materialShininess;
 
 out vec4 fragColor;
 
-
-
-
 //--------------------------------------------------------------------------------------------
 
 mat3 cotangent_frame( vec3 N, vec3 p, vec2 uv ) {
@@ -74,6 +71,7 @@ vec3 perturb_normal( vec3 N, vec3 V, vec2 texcoord ) {
 
 #define WITH_NORMALMAP
 
+
 void main() {
 
     vec3 N = normalize(g_vertexNormal);
@@ -104,9 +102,7 @@ void main() {
     // ...
 
     vec4 whiteColor = vec4(1.0);
-    vec4 surfaceColor = texture( mapSurface, g_texcoord );
-
-    //surfaceColor = whiteColor;
+    vec4 surfaceColor = texture( mapSurface, g_texcoord);
 
     vec4 lightTerm = vec4(ambientColor + emissiveColor + diffuseColor + specularColor, 1.0);
 

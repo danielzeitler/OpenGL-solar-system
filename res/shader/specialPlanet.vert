@@ -10,7 +10,6 @@ uniform mat4 u_modelMatrix;
 
 uniform vec3 u_cameraPosition;
 
-
 out vec2 g_texcoord;
 out vec3 g_vertexNormal;
 out vec3 g_vertexPosition;
@@ -32,7 +31,7 @@ void main() {
     // viewVector
     g_viewVector = u_cameraPosition - vertexPosition;
 
-    // fragüpos
+    // fragpos
     gl_Position = u_mvp * vec4(in_position, 1.0);
 
 }

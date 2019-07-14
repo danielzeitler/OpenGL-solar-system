@@ -105,7 +105,7 @@ set(GLOBAL_COMPILER_FLAGS "-std=c++11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GLOBAL_COMPILER_FLAGS} ${COMPILER_FLAGS}")
 
 # Set source files
-set(SOURCE_FILES SolarSystem.cpp SolarSystem.h Camera.cpp Camera.h Shader.cpp Shader.h Texture.cpp Texture.h Skybox.cpp Skybox.h Moon.cpp Moon.h SpecialPlanet.cpp SpecialPlanet.h Sphere.cpp Sphere.h)
+set(SOURCE_FILES SolarSystem.cpp SolarSystem.h Camera.cpp Camera.h Shader.cpp Shader.h Texture.cpp Texture.h Skybox.cpp Skybox.h Moon.cpp Moon.h SpecialPlanet.cpp SpecialPlanet.h ShaderPlanet.cpp ShaderPlanet.h Venus.cpp Venus.h Sphere.cpp Sphere.h)
 
 # Set (add) executable name
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})

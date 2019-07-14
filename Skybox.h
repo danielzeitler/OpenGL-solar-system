@@ -71,8 +71,6 @@ private:
             7, 6, 1, 1, 0, 7,           // Top face
             3, 2, 5, 5, 4, 3            // Bottom face
     };
-
-
 };
 
 

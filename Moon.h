@@ -26,7 +26,6 @@ public:
 
 
 protected:
-
     // TODO: make static (const)
     Sphere* g_sphere = new Sphere(1.0f, 32, 32);
 
@@ -62,6 +61,10 @@ private:
     GLuint g_normalMap;
 
     //-----------------------------------------------------------
+
+    glm::vec3 g_position = glm::vec3(-1.0, 0.0, 0.0);
+
+    glm::vec3 g_scale = glm::vec3(1.0);
 
     glm::quat g_rotation = QUAT_IDENTITY;
 
